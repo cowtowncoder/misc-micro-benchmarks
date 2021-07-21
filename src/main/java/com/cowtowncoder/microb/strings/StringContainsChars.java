@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableList;
 @BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 //During dev, use lower; for real measurements, higher
-//@Fork(value = 3)
-@Fork(value = 1)
+@Fork(value = 3)
+//@Fork(value = 1)
 @Measurement(iterations = 5, time = 1)
 @Warmup(iterations = 3, time = 1)
 public class StringContainsChars
@@ -109,44 +109,12 @@ public class StringContainsChars
 
     /*
     /**********************************************************************
-    /* Main test methods/2: 3rd party
-    /**********************************************************************
-     */
-    
-    @Benchmark
-    public int method2a_guavaBasedCheck(Blackhole bh) {
-        int count = 0;
-        for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
-            count += _guavaBasedCheck(term);
-        }
-        return _verifyCount(count);
-    }
-
-    private int _guavaBasedCheck(String str) {
-        return CHECKED_CHARS_GUAVA_MATCHER.matchesAnyOf(str) ? 1 : 0;
-    }
-
-    @Benchmark
-    public int method2b_commonsLang3ContainsAny(Blackhole bh) {
-        int count = 0;
-        for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
-            count += _commonsLang3Check(term);
-        }
-        return _verifyCount(count);
-    }
-
-    private int _commonsLang3Check(String str) {
-        return StringUtils.containsAny(str, CHECKED_CHARS_AS_STRING) ? 1 : 0;
-    }
-
-    /*
-    /**********************************************************************
-    /* Main test methods/3: straight-forward, JDK
+    /* Main test methods/2: straight-forward, JDK
     /**********************************************************************
      */
 
     @Benchmark
-    public int method3a_stringIndexOfTimesN(Blackhole bh) {
+    public int method2a_stringIndexOfTimesN(Blackhole bh) {
         int count = 0;
         for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
             count += _stringIndexOfTimesN(term);
@@ -165,7 +133,7 @@ public class StringContainsChars
     }
 
     @Benchmark
-    public int method3b_scanStringAndIndexOf(Blackhole bh) {
+    public int method2b_scanStringAndIndexOf(Blackhole bh) {
         int count = 0;
         for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
             count += _scanStringAndIndexOf(term);
@@ -184,7 +152,7 @@ public class StringContainsChars
     }
 
     @Benchmark
-    public int method3c_scanWithSwitch(Blackhole bh) {
+    public int method2c_scanWithSwitch(Blackhole bh) {
         int count = 0;
         for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
             count += _scanWithSwitchCheck(term);
@@ -209,7 +177,7 @@ public class StringContainsChars
     }
 
     @Benchmark
-    public int method3d_toCharArrayWithSwitch(Blackhole bh) {
+    public int method2d_toCharArrayWithSwitch(Blackhole bh) {
         int count = 0;
         for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
             count += _toCharArrayWithSwitch(term.toCharArray());
@@ -231,6 +199,38 @@ public class StringContainsChars
             }
         }
         return 0;
+    }
+
+    /*
+    /**********************************************************************
+    /* Main test methods/3: 3rd party
+    /**********************************************************************
+     */
+
+    @Benchmark
+    public int method3a_guavaBasedCheck(Blackhole bh) {
+        int count = 0;
+        for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
+            count += _guavaBasedCheck(term);
+        }
+        return _verifyCount(count);
+    }
+
+    private int _guavaBasedCheck(String str) {
+        return CHECKED_CHARS_GUAVA_MATCHER.matchesAnyOf(str) ? 1 : 0;
+    }
+
+    @Benchmark
+    public int method3b_commonsLang3ContainsAny(Blackhole bh) {
+        int count = 0;
+        for (String term : TEST_STRINGS_FOR_CHECKED_CHARS) {
+            count += _commonsLang3Check(term);
+        }
+        return _verifyCount(count);
+    }
+
+    private int _commonsLang3Check(String str) {
+        return StringUtils.containsAny(str, CHECKED_CHARS_AS_STRING) ? 1 : 0;
     }
 
     /*
@@ -272,7 +272,7 @@ public class StringContainsChars
         }
         return 0;
     }
-    
+
     /*
     /**********************************************************************
     /* Helper methods
