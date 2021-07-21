@@ -1,4 +1,4 @@
-# Miscellaenous Micro-benchmarks by mr. Jackson
+# Miscellaneous Micro-benchmarks by mr. Jackson
 
 This is a repo containing a set of Java micro-benchmarks using
 [jmh](https://openjdk.java.net/projects/code-tools/jmh/) framework.
