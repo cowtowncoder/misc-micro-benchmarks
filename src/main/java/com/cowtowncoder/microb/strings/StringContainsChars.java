@@ -17,6 +17,15 @@ import org.openjdk.jmh.infra.Blackhole;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
 
+/**
+ * Test for measuring and comparing performance of "Does this String contain one of these characters"
+ * implementations.
+ * See
+ * <a href="https://cowtowncoder.medium.com/measuring-string-indexofany-string-performance-java-fecb9eb473fa>Blog Post</a>
+ * for a more complete discussion.
+ *
+ * @author Tatu Saloranta
+ */
 @BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 //During dev, use lower; for real measurements, higher
@@ -68,7 +77,7 @@ public class StringContainsChars
         }
         CHECKED_CHARS_PATTERN = Pattern.compile(sb.append("]").toString());
     }
-    
+
     // For test data find some balance; most with no special characters;
     // one or two with match, including first and last entries
     public static final String[] TEST_STRINGS_FOR_CHECKED_CHARS = new String[] {
