@@ -15,8 +15,8 @@ import org.openjdk.jmh.infra.Blackhole;
 @BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 //During dev, use lower; for real measurements, higher
-@Fork(value = 3)
-//@Fork(value = 1)
+//@Fork(value = 3)
+@Fork(value = 1)
 @Measurement(iterations = 5, time = 1)
 @Warmup(iterations = 3, time = 1)
 public class StringConcatenation
@@ -119,17 +119,17 @@ public class StringConcatenation
      */
 
     @Benchmark
-    public int m3_StringBuilderWithPrealloc(Blackhole bh) {
+    public int m3_StringBuilderPrealloc(Blackhole bh) {
         int totalCount = 0;
         for (int i = 0, end = TEST_PAIRS.length; i < end; i += 2) {
             // both permutations for all tests
-            totalCount += _method3_StringBuilderWithPrealloc(TEST_PAIRS[i], TEST_PAIRS[i+1]);
-            totalCount += _method3_StringBuilderWithPrealloc(TEST_PAIRS[i+1], TEST_PAIRS[i]);
+            totalCount += _method3_StringBuilderPrealloc(TEST_PAIRS[i], TEST_PAIRS[i+1]);
+            totalCount += _method3_StringBuilderPrealloc(TEST_PAIRS[i+1], TEST_PAIRS[i]);
         }
         return _check("StringBuilderWithPrealloc", totalCount);
     }
 
-    private final int _method3_StringBuilderWithPrealloc(String first, String second) {
+    private final int _method3_StringBuilderPrealloc(String first, String second) {
         final int len = first.length() + 1 + second.length();
         String concat = new StringBuilder(len).append(first).append('.').append(second)
                 .toString();
