@@ -74,7 +74,7 @@ public class StringConcatenation
      */
 
     @Benchmark
-    public int method1_StringFormat(Blackhole bh) {
+    public int m1_StringFormat(Blackhole bh) {
         int totalCount = 0;
         for (int i = 0, end = TEST_PAIRS.length; i < end; i += 2) {
             // do both permutations for fun
@@ -96,7 +96,7 @@ public class StringConcatenation
      */
 
     @Benchmark
-    public int method2_StringBuilder(Blackhole bh) {
+    public int md2_StringBuilder(Blackhole bh) {
         int totalCount = 0;
         for (int i = 0, end = TEST_PAIRS.length; i < end; i += 2) {
             // both permutations for all tests
@@ -119,7 +119,7 @@ public class StringConcatenation
      */
 
     @Benchmark
-    public int method3_StringBuilderWithPrealloc(Blackhole bh) {
+    public int m3_StringBuilderWithPrealloc(Blackhole bh) {
         int totalCount = 0;
         for (int i = 0, end = TEST_PAIRS.length; i < end; i += 2) {
             // both permutations for all tests
@@ -136,6 +136,28 @@ public class StringConcatenation
         return concat.length();
     }
 
+    /*
+    /**********************************************************************
+    /* Implementation 4: Hand-written with '+'
+    /**********************************************************************
+     */
+
+    @Benchmark
+    public int m4_ManualConcatenation(Blackhole bh) {
+        int totalCount = 0;
+        for (int i = 0, end = TEST_PAIRS.length; i < end; i += 2) {
+            // both permutations for all tests
+            totalCount += _method4_ManualConcatenation(TEST_PAIRS[i], TEST_PAIRS[i+1]);
+            totalCount += _method4_ManualConcatenation(TEST_PAIRS[i+1], TEST_PAIRS[i]);
+        }
+        return _check("ManualConcatenation", totalCount);
+    }
+
+    private final int _method4_ManualConcatenation(String first, String second) {
+        String concat = first + "." + second;
+        return concat.length();
+    }
+    
     /*
     /**********************************************************************
     /* Helper methods
