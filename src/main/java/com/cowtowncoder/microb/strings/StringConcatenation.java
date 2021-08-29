@@ -15,8 +15,8 @@ import org.openjdk.jmh.infra.Blackhole;
 @BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 //During dev, use lower; for real measurements, higher
-//@Fork(value = 3)
-@Fork(value = 1)
+@Fork(value = 3)
+//@Fork(value = 1)
 @Measurement(iterations = 5, time = 1)
 @Warmup(iterations = 3, time = 1)
 public class StringConcatenation
@@ -96,7 +96,7 @@ public class StringConcatenation
      */
 
     @Benchmark
-    public int md2_StringBuilder(Blackhole bh) {
+    public int m2_StringBuilder(Blackhole bh) {
         int totalCount = 0;
         for (int i = 0, end = TEST_PAIRS.length; i < end; i += 2) {
             // both permutations for all tests
