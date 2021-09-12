@@ -8,7 +8,9 @@ import org.openjdk.jmh.infra.Blackhole;
  * "Concate two Strings separated by a fixed short String (or char)"
  * implementations.
  *<p>
- * No published blog post yet.
+ * There is a published
+ * <a href="https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c">blog post</a>
+ * available for some analysis.
  *
  * @author Tatu Saloranta
  */
