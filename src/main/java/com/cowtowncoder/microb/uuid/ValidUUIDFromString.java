@@ -18,6 +18,7 @@ import org.openjdk.jmh.infra.Blackhole;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.RandomBasedGenerator;
+import com.fasterxml.uuid.impl.UUIDUtil;
 
 /**
  * Test for measuring and comparing performance of
@@ -84,26 +85,51 @@ public class ValidUUIDFromString
 
     /*
     /**********************************************************************
-    /* Implementation 2: manual, code from Jackson (UUIDDeserializer.java)
+    /* Implementation 3: JUG's UUIDUtil
     /**********************************************************************
      */
 
     @Benchmark
-    public long m2_UUID_with_manual(Blackhole bh) {
-        long totalSum = _uuidWithManual(INPUT_UUID_STRINGS);
+    public long m2_UUID_with_JUG(Blackhole bh) {
+        long totalSum = _uuidWithJUG(INPUT_UUID_STRINGS);
         return _check("JUG-UUID", totalSum);
     }
 
-    private final long _uuidWithManual(String[] inputs) {
+    private final long _uuidWithJUG(String[] inputs) {
         long sum = 0L;
         for (String str : inputs) {
-            UUID uuid = _uuidFrom(str);
+            UUID uuid = _uuidWithJUG(str);
             sum += uuid.getLeastSignificantBits() + uuid.getMostSignificantBits();
         }
         return sum;
     }
 
-    private final UUID _uuidFrom(String id) {
+    private final UUID _uuidWithJUG(String id) {
+        return UUIDUtil.uuid(id);
+    }
+
+    /*
+    /**********************************************************************
+    /* Implementation 3: manual, code from Jackson (UUIDDeserializer.java)
+    /**********************************************************************
+     */
+
+    @Benchmark
+    public long m3_UUID_with_manual(Blackhole bh) {
+        long totalSum = _uuidWithManual(INPUT_UUID_STRINGS);
+        return _check("Manual-UUID", totalSum);
+    }
+
+    private final long _uuidWithManual(String[] inputs) {
+        long sum = 0L;
+        for (String str : inputs) {
+            UUID uuid = _uuidWithManual(str);
+            sum += uuid.getLeastSignificantBits() + uuid.getMostSignificantBits();
+        }
+        return sum;
+    }
+
+    private final UUID _uuidWithManual(String id) {
         if (id.length() != 36) {
             return _badFormat(id);
         }
