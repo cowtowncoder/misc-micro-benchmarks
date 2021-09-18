@@ -12,10 +12,10 @@ published at [Cowtowncoder@medium](https://cowtowncoder.medium.com/).
 Currently we have following tests (along with blog posts about results)
 
 * String tests under `com.cowtowncoder.microb.strings`
-    * `StringContainsChars`, see: [Measuring “String.indexOfAny(String)” performance](https://cowtowncoder.medium.com/measuring-string-indexofany-string-performance-java-fecb9eb473fa)
-    * `StringConcatenation`, see: [Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c)
+    * `StringContainsChars`, see: [Measuring “String.indexOfAny(String)” performance](https://cowtowncoder.medium.com/measuring-string-indexofany-string-performance-java-fecb9eb473fa) (2021-07-21)
+    * `StringConcatenation`, see: [Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c) (2021-08-29)
 * UUID tests under `com.cowtowncoder.microb.uuid`
-    * `ValidUUIDFromString`, see: [Measuring performance of Java UUID.fromString()](https://cowtowncoder.medium.com/measuring-performance-of-java-uuid-fromstring-or-lack-thereof-d16a910fa32a)
+    * `ValidUUIDFromString`, see: [Measuring performance of Java UUID.fromString()](https://cowtowncoder.medium.com/measuring-performance-of-java-uuid-fromstring-or-lack-thereof-d16a910fa32a) (2021-09-14)
 
 -----
 
@@ -65,12 +65,26 @@ This set of tests is for comparing various ways of producing a String that consi
 
 but for which there are more efficient "manual" alternatives.
 
-For further information check out `com.cowtowncoder.microb.strings.StringConcatenation`
-but here are quick numbers from running
+For further information check out `com.cowtowncoder.microb.strings.StringConcatenation`.
+You may can also run the tests yourself with something like:
 
     java -jar target/microbenchmarks.jar StringContainsChars
 
+There is a blog post
+[Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c) for further discussion on the test case and observed results.
+
+### ValidUUIDFromString
+
+This set of tests is for comparing various ways of reading a `java.util.UUID` from a String representation. With JDK you can do that with
+
+    UUID uuid = UUID.fromString(uuidAsString);
+
+but for which there are more efficient alternatives in existence as well.
+
+For further information check out `com.cowtowncoder.microb.uuid.ValidUUIDFromString`.
+You may can also run the tests yourself with something like:
+
+    java -jar target/microbenchmarks.jar ValidUUIDFromString
 
 There is a blog post
-[Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c) that discusses the scenario
-and shows results.
+[Measuring performance of Java UUID.fromString()](https://cowtowncoder.medium.com/measuring-performance-of-java-uuid-fromstring-or-lack-thereof-d16a910fa32a) for further discussion on the test case and observed results.
