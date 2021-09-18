@@ -2,12 +2,17 @@
 
 This is a repo containing a set of Java micro-benchmarks using
 [jmh](https://openjdk.java.net/projects/code-tools/jmh/) framework.
+Tests focus on use cases that:
+
+1. Are relatively common (author has bumped into them in real codebases)
+2. Have a simple canonical, usually JDK-provided way to do things
+3. Where the canonical approach appears to have non-trivial overhead associated with it
+4. And there is at least one easily applicable alternative with (expected) improved performance
 
 Code written by @cowtowncoder unless otherwise noted; blog posts for results
 published at [Cowtowncoder@medium](https://cowtowncoder.medium.com/).
 
-
-## Test included
+## Test currently included
 
 Currently we have following tests (along with blog posts about results)
 
