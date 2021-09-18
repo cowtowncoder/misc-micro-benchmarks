@@ -38,3 +38,25 @@ StringContainsChars.method4a_jdkRegExpBasedCheck      thrpt   15  1838346.183 ±
 StringContainsChars.method4b_bitsetBasedCheck         thrpt   15  9819436.570 ± 300016.151  ops/s
 ```
 
+There is a blog post
+[Measuring “String.indexOfAny(String)” performance](https://cowtowncoder.medium.com/measuring-string-indexofany-string-performance-java-fecb9eb473fa) for further discussion
+
+### StringConcatenation test
+
+This set of tests is for comparing various ways of producing a String that consists of 2 argument Strings, separated by a constant separator (`char` or `String`): something for which a simple readable example looks like:
+
+    String qname = String.format("%s.%s", namespace, localName);
+
+but for which there are more efficient "manual" alternatives.
+
+For further information check out `com.cowtowncoder.microb.strings.StringConcatenation`
+but here are quick numbers from running
+
+    java -jar target/microbenchmarks.jar StringContainsChars
+
+
+There is a blog post
+[Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c) that discusses the scenario
+and shows results.
+
+
