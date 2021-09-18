@@ -3,7 +3,23 @@
 This is a repo containing a set of Java micro-benchmarks using
 [jmh](https://openjdk.java.net/projects/code-tools/jmh/) framework.
 
-## Results
+Code written by @cowtowncoder unless otherwise noted; blog posts for results
+published at [Cowtowncoder@medium](https://cowtowncoder.medium.com/).
+
+
+## Test included
+
+Currently we have following tests (along with blog posts about results)
+
+* String tests under `com.cowtowncoder.microb.strings`
+    * `StringContainsChars`, see: [Measuring “String.indexOfAny(String)” performance](https://cowtowncoder.medium.com/measuring-string-indexofany-string-performance-java-fecb9eb473fa)
+    * `StringConcatenation`, see: [Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c)
+* UUID tests under `com.cowtowncoder.microb.uuid`
+    * `ValidUUIDFromString`, see: [Measuring performance of Java UUID.fromString()](https://cowtowncoder.medium.com/measuring-performance-of-java-uuid-fromstring-or-lack-thereof-d16a910fa32a)
+
+-----
+
+## Test Descriptions
 
 ### StringContainsChars test
 
@@ -58,5 +74,3 @@ but here are quick numbers from running
 There is a blog post
 [Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c) that discusses the scenario
 and shows results.
-
-
