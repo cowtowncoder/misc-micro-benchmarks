@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jmh>1.27</version.jmh>
+        <version.jmh>1.32</version.jmh>
     </properties>
 
     <dependencies>
@@ -39,7 +39,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>27.0-jre</version>
+        <version>31.0.1-jre</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -50,6 +50,11 @@
         <groupId>com.fasterxml.uuid</groupId>
         <artifactId>java-uuid-generator</artifactId>
         <version>4.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.eatthepath</groupId>
+        <artifactId>fast-uuid</artifactId>
+        <version>0.2.0</version>
       </dependency>
 
     </dependencies>

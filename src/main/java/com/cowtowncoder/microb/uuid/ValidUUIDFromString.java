@@ -1,11 +1,9 @@
 package com.cowtowncoder.microb.uuid;
 
-import java.util.Arrays;
-import java.util.Random;
-import java.util.UUID;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
+import com.eatthepath.uuid.FastUUID;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.RandomBasedGenerator;
+import com.fasterxml.uuid.impl.UUIDUtil;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -16,9 +14,11 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.RandomBasedGenerator;
-import com.fasterxml.uuid.impl.UUIDUtil;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Test for measuring and comparing performance of
@@ -49,7 +49,7 @@ public class ValidUUIDFromString
 
     private final static UUID[] INPUT_UUIDS = InputGenerator.generate(UUIDS_TO_TEST);
     private final static String[] INPUT_UUID_STRINGS = Stream.of(INPUT_UUIDS)
-            .map(u -> u.toString())
+            .map(UUID::toString)
             .toArray(String[]::new);
 
     // We'll do basic sanity check that conversion actually works:
@@ -74,7 +74,7 @@ public class ValidUUIDFromString
         return _check("JDK-UUID", totalSum);
     }
 
-    private final long _uuidWithJdk(String[] inputs) {
+    private long _uuidWithJdk(String[] inputs) {
         long sum = 0L;
         for (String str : inputs) {
             UUID uuid = UUID.fromString(str);
@@ -95,7 +95,7 @@ public class ValidUUIDFromString
         return _check("JUG-UUID", totalSum);
     }
 
-    private final long _uuidWithJUG(String[] inputs) {
+    private long _uuidWithJUG(String[] inputs) {
         long sum = 0L;
         for (String str : inputs) {
             UUID uuid = _uuidWithJUG(str);
@@ -104,7 +104,7 @@ public class ValidUUIDFromString
         return sum;
     }
 
-    private final UUID _uuidWithJUG(String id) {
+    private UUID _uuidWithJUG(String id) {
         return UUIDUtil.uuid(id);
     }
 
@@ -120,7 +120,7 @@ public class ValidUUIDFromString
         return _check("Manual-UUID", totalSum);
     }
 
-    private final long _uuidWithManual(String[] inputs) {
+    private long _uuidWithManual(String[] inputs) {
         long sum = 0L;
         for (String str : inputs) {
             UUID uuid = _uuidWithManual(str);
@@ -129,7 +129,7 @@ public class ValidUUIDFromString
         return sum;
     }
 
-    private final UUID _uuidWithManual(String id) {
+    private UUID _uuidWithManual(String id) {
         if (id.length() != 36) {
             return _badFormat(id);
         }
@@ -204,11 +204,36 @@ public class ValidUUIDFromString
 
     /*
     /**********************************************************************
+    /* Implementation 5: fast-uuid
+    /**********************************************************************
+     */
+
+    @Benchmark
+    public long m2_UUID_with_fast_uuid(Blackhole bh) {
+        long totalSum = _uuidWithFastUuid(INPUT_UUID_STRINGS);
+        return _check("fast-uuid-UUID", totalSum);
+    }
+
+    private long _uuidWithFastUuid(String[] inputs) {
+        long sum = 0L;
+        for (String str : inputs) {
+            UUID uuid = _uuidWithFastUuid(str);
+            sum += uuid.getLeastSignificantBits() + uuid.getMostSignificantBits();
+        }
+        return sum;
+    }
+
+    private UUID _uuidWithFastUuid(String id) {
+        return FastUUID.parseUUID(id);
+    }
+
+    /*
+    /**********************************************************************
     /* Helper class(es), methods
     /**********************************************************************
      */
 
-    private final long _check(String testName, long totalSum)
+    private long _check(String testName, long totalSum)
     {
         if (totalSum != EXP_TOTAL_SUM) {
             throw new IllegalArgumentException("Test '"+testName+"' fail: Excepted total sum "
