@@ -1,9 +1,11 @@
 package com.cowtowncoder.microb.uuid;
 
-import com.eatthepath.uuid.FastUUID;
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.RandomBasedGenerator;
-import com.fasterxml.uuid.impl.UUIDUtil;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -14,18 +16,20 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.util.Arrays;
-import java.util.Random;
-import java.util.UUID;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import com.eatthepath.uuid.FastUUID;
+
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.RandomBasedGenerator;
+import com.fasterxml.uuid.impl.UUIDUtil;
 
 /**
  * Test for measuring and comparing performance of
  * constructing a {@link java.util.UUID} from a valid 36-character
  * representation.
  *<p>
- * No published blog post yet.
+ * There is a published
+ * <a href="https://cowtowncoder.medium.com/measuring-performance-of-java-uuid-fromstring-or-lack-thereof-d16a910fa32a">blog post</a>
+ * available for some analysis.
  *
  * @author Tatu Saloranta
  */
@@ -49,7 +53,7 @@ public class ValidUUIDFromString
 
     private final static UUID[] INPUT_UUIDS = InputGenerator.generate(UUIDS_TO_TEST);
     private final static String[] INPUT_UUID_STRINGS = Stream.of(INPUT_UUIDS)
-            .map(UUID::toString)
+            .map(u -> u.toString())
             .toArray(String[]::new);
 
     // We'll do basic sanity check that conversion actually works:
@@ -233,7 +237,7 @@ public class ValidUUIDFromString
     /**********************************************************************
      */
 
-    private long _check(String testName, long totalSum)
+    private final long _check(String testName, long totalSum)
     {
         if (totalSum != EXP_TOTAL_SUM) {
             throw new IllegalArgumentException("Test '"+testName+"' fail: Excepted total sum "
