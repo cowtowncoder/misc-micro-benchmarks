@@ -51,6 +51,11 @@
         <artifactId>java-uuid-generator</artifactId>
         <version>4.0.1</version>
       </dependency>
+      <dependency>
+        <groupId>com.eatthepath</groupId>
+        <artifactId>fast-uuid</artifactId>
+        <version>0.2.0</version>
+      </dependency>
 
     </dependencies>
 
