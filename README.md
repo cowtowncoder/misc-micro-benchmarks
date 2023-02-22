@@ -16,6 +16,8 @@ published at [Cowtowncoder@medium](https://cowtowncoder.medium.com/).
 
 Currently we have following tests (along with blog posts about results)
 
+* Number parsing tests `com.cowtowncoder.microb.numbers`
+    * `LongNumberParsing` (2023-02-21) -- not blogged about yet
 * String tests under `com.cowtowncoder.microb.strings`
     * `StringContainsChars`, see: [Measuring “String.indexOfAny(String)” performance](https://cowtowncoder.medium.com/measuring-string-indexofany-string-performance-java-fecb9eb473fa) (2021-07-21)
     * `StringConcatenation`, see: [Measuring performance of Java String.format()](https://cowtowncoder.medium.com/measuring-performance-of-java-string-format-or-lack-thereof-2e1c6a13362c) (2021-08-29)
@@ -25,6 +27,30 @@ Currently we have following tests (along with blog posts about results)
 -----
 
 ## Test Descriptions
+
+### LongNumberParsing test
+
+Tests simple parsing of 1000-digit long numbers of types:
+
+* `java.lang.Double`
+* `java.math.BigDecimal`
+* `java.math.BigInteger`
+
+where number used for first two is identical, and for `BigInteger` same digits but without decimal point.
+
+For further information check out `com.cowtowncoder.microb.numbers.LongNumberParsing`
+but here are quick numbers from running (on JDK 8 and 17, very similar results)
+
+java -jar target/microbenchmarks.jar LongNumberParsing
+
+```
+Benchmark                               Mode  Cnt    Score   Error  Units
+LongNumberParsing.perfParseBigDecimal  thrpt    5  639.419 ± 3.421  ops/s
+LongNumberParsing.perfParseBigInteger  thrpt    5  672.288 ± 1.835  ops/s
+LongNumberParsing.perfParseDouble      thrpt    5  435.754 ± 2.247  ops/s
+```
+
+so `BigDecimal` and `BigInteger` are -- interestingly enough -- equally fast/slow; and `java.lang.Double` is bit slower (maybe due to base-2 vs base-10 difference?)
 
 ### StringContainsChars test
 
