@@ -58,18 +58,18 @@ public class JsonNodeReading
     /* Test methods
     /**********************************************************************
      */
-    
-    @Benchmark
-    public void perfJacksonObjectMapper(Blackhole bh) throws Exception {
-        JsonNode doc = JSON_MAPPER.readTree(inputJson());
-        bh.consume(doc);
-    }
 
     @Benchmark
     public void perfOptimizedReader(Blackhole bh) throws Exception {
         JsonParser p = JSON_MAPPER.createParser(inputJson());
         JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER, p).readTree();
         p.close();
+        bh.consume(doc);
+    }
+
+    @Benchmark
+    public void perfStandardJacksonReader(Blackhole bh) throws Exception {
+        JsonNode doc = JSON_MAPPER.readTree(inputJson());
         bh.consume(doc);
     }
 

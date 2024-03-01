@@ -73,6 +73,63 @@ public final class CustomJsonNodeReader
         return arr;
     }
 
+    // Variant with inlined _readAny()
+    // (not any faster)
+    /*
+    private JsonNode _readArray(String parentProp) throws IOException
+    {
+        ArrayNode arr = _nodes.arrayNode();
+        while (_parser.nextToken() != JsonToken.END_ARRAY) {
+            // Inlined _readAny:
+
+            JsonNode value;
+
+            switch (_parser.currentTokenId()) {
+            case JsonTokenId.ID_START_OBJECT:
+                value = _readObject(parentProp);
+                break;
+            case JsonTokenId.ID_START_ARRAY:
+                value = _readArray(parentProp);
+                break;
+            case JsonTokenId.ID_STRING:
+                value = _nodes.textNode(_parser.getText());
+                break;
+            case JsonTokenId.ID_NUMBER_INT:
+                JsonParser.NumberType nt = _parser.getNumberType();
+                if (nt == JsonParser.NumberType.INT) {
+                    value = _nodes.numberNode(_parser.getIntValue());
+                } else if (nt == JsonParser.NumberType.LONG) {
+                    value = _nodes.numberNode(_parser.getLongValue());
+                } else {
+                    value = _nodes.numberNode(_parser.getBigIntegerValue());
+                }
+                break;
+            case JsonTokenId.ID_NUMBER_FLOAT:
+                if (_cfgFloatsAsBigDecimal) {
+                    value = _nodes.numberNode(_parser.getDecimalValue());
+                } else {
+                    value = _nodes.numberNode(_parser.getDoubleValue());
+                }
+                break;
+            case JsonTokenId.ID_TRUE:
+                value = _nodes.booleanNode(true);
+                break;
+            case JsonTokenId.ID_FALSE:
+                value = _nodes.booleanNode(false);
+                break;
+            case JsonTokenId.ID_NULL:
+                value =  _nodes.nullNode();
+                break;
+            default:
+                throw _readError("Internal state error: current token type unsupported: "
+                        +_parser.currentToken());
+            }
+            arr.add(value);
+        }
+        return arr;
+    }
+    */
+
     private JsonNode _readAny(String parentProp) throws IOException
     {
         switch (_parser.currentTokenId()) {
