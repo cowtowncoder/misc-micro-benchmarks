@@ -1,10 +1,10 @@
 #!/bin/sh
 
-java  -Xmx256m -jar target/microbenchmarks.jar -XX:+DebugNonSafepoints $*
-
-# java  -Xmx256m -jar target/microbenchmarks.jar -XX:+DebugNonSafepoints -XX:+UnlockDiagnosticVMOptions $*
+java  -Xmx256m -jar target/microbenchmarks.jar $*
+# java  -Xmx256m -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar target/microbenchmarks.jar $*
 
 # TODO:
-# java  -Xmx256m -jar target/microbenchmarks.jar -XX:+DebugNonSafepoints -XX:+UnlockDiagnosticVMOptions \
-# -prof "async:output=flamegraph;dir=/tmp;libPath=/usr/local/async-profiler/curr/build/libasyncProfiler.so"
+# java  -Xmx256m -XX:+DebugNonSafepoints -XX:+UnlockDiagnosticVMOptions \
+#    -jar target/microbenchmarks.jar
+#    -prof "async:output=flamegraph;dir=/tmp;libPath=/usr/local/async-profiler/curr/build/libasyncProfiler.so"
 #	$*
