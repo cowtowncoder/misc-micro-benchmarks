@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ArrayBuilders;
+import com.fasterxml.jackson.databind.util.ArrayBuilders.FloatBuilder;
 
 public final class CustomJsonNodeReader
 {
@@ -17,6 +19,8 @@ public final class CustomJsonNodeReader
     private final JsonParser _parser;
 
     private final boolean _cfgFloatsAsBigDecimal;
+
+    private final ArrayBuilders _arrayBuilders = new ArrayBuilders();
     
     public CustomJsonNodeReader(ObjectMapper m, JsonParser p) {
         _nodes = m.getNodeFactory();
@@ -67,6 +71,9 @@ public final class CustomJsonNodeReader
     // Simple, straight-forward version:
     private JsonNode _readArray(String parentProp) throws IOException
     {
+        if ("$vector".equals(parentProp)) {
+            return _readVector();
+        }
         ArrayNode arr = _nodes.arrayNode();
         while (_parser.nextToken() != JsonToken.END_ARRAY) {
             arr.add(_readAny(null));
@@ -166,6 +173,43 @@ public final class CustomJsonNodeReader
                 +_parser.currentToken());
     }
 
+    private JsonNode _readVector() throws IOException
+    {
+        FloatBuilder b = _arrayBuilders.getFloatBuilder();
+        JsonToken t;
+
+        float[] chunk = b.resetAndStart();
+        int ix = 0;
+        while ((t = _parser.nextToken()) != JsonToken.END_ARRAY) {
+            if (t != JsonToken.VALUE_NUMBER_FLOAT && t != JsonToken.VALUE_NUMBER_INT) {
+                throw _readError("Invalid content in \"$vector\": expected JSON Number, got: "
+                        +t);
+            }
+            if (ix >= chunk.length) {
+                chunk = b.appendCompletedChunk(chunk, ix);
+                ix = 0;
+            }
+            chunk[ix++] = _parser.getFloatValue();
+        }
+        float[] vector = b.completeAndClearBuffer(chunk, ix);
+        return _nodes.pojoNode(vector);
+    }
+    /*
+    private JsonNode _readVector() throws IOException
+    {
+        ArrayNode arr = _nodes.arrayNode();
+        JsonToken t;
+        while ((t = _parser.nextToken()) != JsonToken.END_ARRAY) {
+            if (t != JsonToken.VALUE_NUMBER_FLOAT && t != JsonToken.VALUE_NUMBER_INT) {
+                throw _readError("Invalid content in \"$vector\": expected JSON Number, got: "
+                        +t);
+            }
+            arr.add(_parser.getText());
+        }
+        return arr;
+    }
+*/
+    
     private StreamReadException _readError(String msg) {
         return new JsonParseException(_parser, msg);
     }
