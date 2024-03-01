@@ -64,6 +64,7 @@ public final class CustomJsonNodeReader
         return ob;
     }
 
+    // Simple, straight-forward version:
     private JsonNode _readArray(String parentProp) throws IOException
     {
         ArrayNode arr = _nodes.arrayNode();
@@ -74,7 +75,7 @@ public final class CustomJsonNodeReader
     }
 
     // Variant with inlined _readAny()
-    // (not any faster)
+    // (not measurably faster)
     /*
     private JsonNode _readArray(String parentProp) throws IOException
     {
