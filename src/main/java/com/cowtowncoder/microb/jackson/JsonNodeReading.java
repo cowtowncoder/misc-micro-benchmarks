@@ -4,6 +4,9 @@ import java.io.*;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +21,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 @BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 //During dev, use lower; for real measurements, higher
-//@Fork(value = 1)
-@Fork(value = 3)
+@Fork(value = 1)
+//@Fork(value = 3)
 @Measurement(iterations = 3, time = 3)
 @Warmup(iterations = 3, time = 1)
 public class JsonNodeReading
@@ -47,8 +50,8 @@ public class JsonNodeReading
     }
 
     @Benchmark
-    public void perfHandOptimized(Blackhole bh) throws Exception {
-        Object doc = JSON_MAPPER.readValue(inputJson(), Object.class);
+    public void perfOptimizedReader(Blackhole bh) throws Exception {
+        JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER).readTree(inputJson());
         bh.consume(doc);
     }
 
@@ -61,5 +64,11 @@ public class JsonNodeReading
     private InputStream inputJson() {
         return new ByteArrayInputStream(INPUT_JSON);
     }
-
+    
+    public static void main(String[] args) throws Exception {
+        Options opt = new OptionsBuilder()
+                .include(JsonNodeReading.class.getSimpleName())
+                .build();
+        new Runner(opt).run();
+    }
 }
