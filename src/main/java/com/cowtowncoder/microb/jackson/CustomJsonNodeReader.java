@@ -16,6 +16,10 @@ import com.fasterxml.jackson.databind.util.ArrayBuilders.FloatBuilder;
 
 public final class CustomJsonNodeReader
 {
+    /**
+     * Enumeration that specifies how decoding of {@code $vector}
+     * property -- floating-point array valued -- is to be handled.
+     */
     public enum VectorsAs {
         /**
          * Default handling: basically similar to List<Number>
@@ -32,7 +36,12 @@ public final class CustomJsonNodeReader
          * Short-cut to get textual representation, store as
          * ArrayNode of TextNodes
          */
-        LIST_OF_STRINGS
+        LIST_OF_STRINGS,
+
+        /**
+         * Option that simply skips value altogether (maps to {@code null}).
+         */
+        SKIP
     }
 
     private final JsonNodeFactory _nodes;
@@ -105,6 +114,10 @@ public final class CustomJsonNodeReader
             case LIST_OF_NUMBERS:
                 // Default, fall-through
                 break;
+            case SKIP:
+                // No-op but must skip actual values
+                _parser.skipChildren();
+                return null;
             }
         }
         ArrayNode arr = _nodes.arrayNode();

@@ -95,6 +95,16 @@ public class JsonNodeReading
         bh.consume(doc);
     }
 
+    @Benchmark
+    public void perfOptimizedVectorSkip(Blackhole bh) throws Exception {
+        JsonParser p = JSON_MAPPER.createParser(inputJson());
+        JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER, p,
+                CustomJsonNodeReader.VectorsAs.SKIP)
+                    .readTree();
+        p.close();
+        bh.consume(doc);
+    }
+
     /*
     /**********************************************************************
     /* Helper methods
