@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 //@Fork(value = 1)
 @Fork(value = 3)
 @Measurement(iterations = 3, time = 3)
-@Warmup(iterations = 3, time = 1)
+@Warmup(iterations = 4, time = 1)
 public class JsonNodeReading
 {
     /*
@@ -60,16 +60,38 @@ public class JsonNodeReading
      */
 
     @Benchmark
-    public void perfOptimizedReader(Blackhole bh) throws Exception {
+    public void perfDefaultJacksonReader(Blackhole bh) throws Exception {
+        JsonNode doc = JSON_MAPPER.readTree(inputJson());
+        bh.consume(doc);
+    }
+
+    @Benchmark
+    public void perfOptimizedBasic(Blackhole bh) throws Exception {
         JsonParser p = JSON_MAPPER.createParser(inputJson());
-        JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER, p).readTree();
+        JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER, p,
+                CustomJsonNodeReader.VectorsAs.LIST_OF_NUMBERS)
+                    .readTree();
         p.close();
         bh.consume(doc);
     }
 
     @Benchmark
-    public void perfStandardJacksonReader(Blackhole bh) throws Exception {
-        JsonNode doc = JSON_MAPPER.readTree(inputJson());
+    public void perfOptimizedFloatArray(Blackhole bh) throws Exception {
+        JsonParser p = JSON_MAPPER.createParser(inputJson());
+        JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER, p,
+                CustomJsonNodeReader.VectorsAs.ARRAY_OF_FLOATS)
+                    .readTree();
+        p.close();
+        bh.consume(doc);
+    }
+
+    @Benchmark
+    public void perfOptimizedStringList(Blackhole bh) throws Exception {
+        JsonParser p = JSON_MAPPER.createParser(inputJson());
+        JsonNode doc = new CustomJsonNodeReader(JSON_MAPPER, p,
+                CustomJsonNodeReader.VectorsAs.LIST_OF_STRINGS)
+                	.readTree();
+        p.close();
         bh.consume(doc);
     }
 

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 java  -Xmx256m -jar target/microbenchmarks.jar $*
+
 # java  -Xmx256m -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar target/microbenchmarks.jar $*
 
 # TODO:

@@ -1,6 +1,7 @@
 package com.cowtowncoder.microb.jackson;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -15,16 +16,40 @@ import com.fasterxml.jackson.databind.util.ArrayBuilders.FloatBuilder;
 
 public final class CustomJsonNodeReader
 {
+    public enum VectorsAs {
+        /**
+         * Default handling: basically similar to List<Number>
+         * (ArrayNode of NumberNodes)
+         */
+        LIST_OF_NUMBERS,
+
+        /**
+         * Embedded opaque "POJO" value wrapping `float[]`
+         */
+        ARRAY_OF_FLOATS,
+
+        /**
+         * Short-cut to get textual representation, store as
+         * ArrayNode of TextNodes
+         */
+        LIST_OF_STRINGS
+    }
+
     private final JsonNodeFactory _nodes;
     private final JsonParser _parser;
+
+    private final VectorsAs _vectorsAs;
 
     private final boolean _cfgFloatsAsBigDecimal;
 
     private final ArrayBuilders _arrayBuilders = new ArrayBuilders();
     
-    public CustomJsonNodeReader(ObjectMapper m, JsonParser p) {
+    public CustomJsonNodeReader(ObjectMapper m, JsonParser p,
+            VectorsAs vectorsAs)
+    {
         _nodes = m.getNodeFactory();
         _parser = p;
+        _vectorsAs = Objects.requireNonNull(vectorsAs);
         _cfgFloatsAsBigDecimal = m.isEnabled(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
     }
 
@@ -72,7 +97,15 @@ public final class CustomJsonNodeReader
     private JsonNode _readArray(String parentProp) throws IOException
     {
         if ("$vector".equals(parentProp)) {
-            return _readVector();
+            switch (_vectorsAs) {
+            case ARRAY_OF_FLOATS:
+                return _readVectorAsFloatArray();
+            case LIST_OF_STRINGS:
+                return _readVectorAsListOfStrings();
+            case LIST_OF_NUMBERS:
+                // Default, fall-through
+                break;
+            }
         }
         ArrayNode arr = _nodes.arrayNode();
         while (_parser.nextToken() != JsonToken.END_ARRAY) {
@@ -173,7 +206,7 @@ public final class CustomJsonNodeReader
                 +_parser.currentToken());
     }
 
-    private JsonNode _readVector() throws IOException
+    private JsonNode _readVectorAsFloatArray() throws IOException
     {
         FloatBuilder b = _arrayBuilders.getFloatBuilder();
         JsonToken t;
@@ -194,8 +227,8 @@ public final class CustomJsonNodeReader
         float[] vector = b.completeAndClearBuffer(chunk, ix);
         return _nodes.pojoNode(vector);
     }
-    /*
-    private JsonNode _readVector() throws IOException
+
+    private JsonNode _readVectorAsListOfStrings() throws IOException
     {
         ArrayNode arr = _nodes.arrayNode();
         JsonToken t;
@@ -208,7 +241,6 @@ public final class CustomJsonNodeReader
         }
         return arr;
     }
-*/
     
     private StreamReadException _readError(String msg) {
         return new JsonParseException(_parser, msg);
