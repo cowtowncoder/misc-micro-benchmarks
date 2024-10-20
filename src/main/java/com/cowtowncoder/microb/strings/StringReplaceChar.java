@@ -1,11 +1,11 @@
 package com.cowtowncoder.microb.strings;
 
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.infra.Blackhole;
-
 // 28-Aug-2021, tatu: Incomplete / Work-in-progress
 
 /*
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
+
 @BenchmarkMode(Mode.Throughput)
 @State(Scope.Benchmark)
 //During dev, use lower; for real measurements, higher
