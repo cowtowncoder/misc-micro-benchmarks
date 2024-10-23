@@ -1,4 +1,4 @@
-package com.cowtowncoder.microb.jackson;
+package com.cowtowncoder.microb.jackson.jsonnode;
 
 import java.io.*;
 

@@ -23,7 +23,10 @@ public class InputData
 
     public Class<?> modelClass() { return _modelClass; }
     public byte[] serialized() { return _serialized; }
-    public Object deserialized() { return _deserialized; }
+    @SuppressWarnings("unchecked")
+    public <T> T deserialized() {
+        return (T) _deserialized;
+    }
 
     public static InputData get(InputJson key) {
         return Loader.instance().get(key);
