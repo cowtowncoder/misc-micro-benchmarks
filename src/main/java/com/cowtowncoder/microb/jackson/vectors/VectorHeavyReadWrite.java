@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.cowtowncoder.microb.jackson.model.HuggingFaceCohereScidocsQueries;
 import com.cowtowncoder.microb.jackson.model.InputData;
 import com.cowtowncoder.microb.jackson.model.InputJson;
+import com.cowtowncoder.microb.util.NopOutputStream;
 
 /**
  * Test for measuring parsing performance from JSON to
@@ -30,7 +31,7 @@ import com.cowtowncoder.microb.jackson.model.InputJson;
 //@Fork(value = 1)
 @Fork(value = 3)
 @Measurement(iterations = 3, time = 3)
-@Warmup(iterations = 4, time = 1)
+@Warmup(iterations = 3, time = 1)
 public class VectorHeavyReadWrite
 {
     /*
@@ -63,14 +64,39 @@ public class VectorHeavyReadWrite
      */
 
     @Benchmark
-    public void readUsingVanilla(Blackhole bh) throws Exception {
-        HuggingFaceCohereScidocsQueries doc = _readUsing(JSON_MAPPER_VANILLA);
+    public void defaultRead(Blackhole bh) throws Exception {
+        Object doc = _readUsing(JSON_MAPPER_VANILLA);
         bh.consume(doc);
     }
 
     @Benchmark
-    public void readUsingFastFP(Blackhole bh) throws Exception {
-        HuggingFaceCohereScidocsQueries doc = _readUsing(JSON_MAPPER_FAST_FP);
+    public void defaultWrite(Blackhole bh) throws Exception {
+        int len = _writeUsing(JSON_MAPPER_VANILLA);
+        bh.consume(len);
+    }
+
+    @Benchmark
+    public void defaultWriteAndRead(Blackhole bh) throws Exception {
+        Object doc = _readWriteUsing(JSON_MAPPER_VANILLA);
+        bh.consume(doc);
+    }
+
+    @Benchmark
+    public void fastFPRead(Blackhole bh) throws Exception {
+        Object doc = _readUsing(JSON_MAPPER_FAST_FP);
+        bh.consume(doc);
+    }
+
+
+    @Benchmark
+    public void fastFPWrite(Blackhole bh) throws Exception {
+        int len = _writeUsing(JSON_MAPPER_FAST_FP);
+        bh.consume(len);
+    }
+
+    @Benchmark
+    public void fastFPWriteAndRead(Blackhole bh) throws Exception {
+        Object doc = _readWriteUsing(JSON_MAPPER_FAST_FP);
         bh.consume(doc);
     }
 
@@ -80,8 +106,21 @@ public class VectorHeavyReadWrite
     /**********************************************************************
      */
 
-    private HuggingFaceCohereScidocsQueries _readUsing(ObjectMapper mapper) throws IOException {
+    private Object _readUsing(ObjectMapper mapper) throws IOException {
         return mapper.readValue(_serialized, HuggingFaceCohereScidocsQueries.class);
+    }
+    
+    private int _writeUsing(ObjectMapper mapper) throws IOException {
+        try (NopOutputStream out = new NopOutputStream()) {
+            mapper.writeValue(out, _deserialized);
+            return out.size();
+        }
+    }
+
+    private Object _readWriteUsing(ObjectMapper mapper) throws IOException {
+        Object doc = _readUsing(mapper);
+        /*int len =*/ _writeUsing(mapper);
+        return doc;
     }
     
     /*
