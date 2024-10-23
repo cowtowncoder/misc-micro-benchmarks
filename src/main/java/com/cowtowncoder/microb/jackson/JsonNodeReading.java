@@ -8,7 +8,8 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import com.cowtowncoder.microb.util.InputJson;
+import com.cowtowncoder.microb.jackson.model.InputData;
+import com.cowtowncoder.microb.jackson.model.InputJson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.StreamReadFeature;
@@ -20,7 +21,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 
 /**
  * Test for measuring parsing performance from JSON to
- * {@JsonNode} using different implemnetations
+ * {@JsonNode} using different implementations
  *
  * @author Tatu Saloranta
  */
@@ -39,7 +40,7 @@ public class JsonNodeReading
     /**********************************************************************
      */
 
-    private final byte[] INPUT_JSON = InputJson.FRIENDS_WITH_VECTORS.bytes();
+    private final byte[] INPUT_JSON = InputData.get(InputJson.FRIENDS_WITH_VECTORS).serialized();
 
     private final ObjectMapper JSON_MAPPER;
     {
