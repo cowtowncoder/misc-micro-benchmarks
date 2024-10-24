@@ -20,8 +20,9 @@ import com.cowtowncoder.microb.jackson.model.InputJson;
 import com.cowtowncoder.microb.util.NopOutputStream;
 
 /**
- * Test for measuring parsing performance from JSON to
- * {@JsonNode} using different implementations
+ * Test for measuring parsing performance of reading and/or writing
+ * JSON content with mostly floating-point content (big {@code float[]} values)
+ * with and without FP-optimizations.
  *
  * @author Tatu Saloranta
  */
@@ -86,7 +87,6 @@ public class VectorHeavyReadWrite
         Object doc = _readUsing(JSON_MAPPER_FAST_FP);
         bh.consume(doc);
     }
-
 
     @Benchmark
     public void fastFPWrite(Blackhole bh) throws Exception {
