@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.StreamWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.cowtowncoder.microb.jackson.model.HuggingFaceCohereScidocsQueries;
 import com.cowtowncoder.microb.jackson.model.InputData;
 import com.cowtowncoder.microb.jackson.model.InputJson;
@@ -58,15 +58,57 @@ public class VectorHeavyReadWrite
         JSON_MAPPER_FAST_FP = new JsonMapper(f);
     }
 
+    // And then finally "Binary Vector" handling:
+    private final ObjectMapper JSON_MAPPER_BASE64;
+    {
+        SimpleModule mod = new SimpleModule()
+            .addDeserializer(float[].class, new Base64FloatVectorDeserializer())
+            .addSerializer(float[].class, new Base64FloatVectorSerializer());
+        JSON_MAPPER_BASE64 = JsonMapper.builder()
+                .addModule(mod)
+                .build();
+    }
+
+    // One other thing: since "Binary Vector" is a special case, we need
+    // to generate different "serialized" representation.
+
+    private final byte[] _serializedBase64;
+    {
+        try {
+            _serializedBase64 = JSON_MAPPER_BASE64.writeValueAsBytes(_deserialized);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /*
+    /**********************************************************************
+    /* Set up
+    /**********************************************************************
+     */
+
+    @Setup(Level.Trial)
+    public void setup() {
+        System.out.println();
+        System.out.println("------------------");
+        System.out.printf("Input length (array):  %d%n", _serialized.length);
+        System.out.printf(" (%d docs; vector length: %d)%n", _deserialized.data.size(),
+                _deserialized.data.get(0).emb.length);
+        System.out.printf("Input length (base64): %d%n", _serializedBase64.length);
+        System.out.println("------------------");
+    }
+    
     /*
     /**********************************************************************
     /* Test methods
     /**********************************************************************
      */
 
+    // Default: Vector as array, no FP optimizations
+    
     @Benchmark
     public void defaultRead(Blackhole bh) throws Exception {
-        Object doc = _readUsing(JSON_MAPPER_VANILLA);
+        Object doc = _readUsing(JSON_MAPPER_VANILLA, _serialized);
         bh.consume(doc);
     }
 
@@ -78,13 +120,15 @@ public class VectorHeavyReadWrite
 
     @Benchmark
     public void defaultWriteAndRead(Blackhole bh) throws Exception {
-        Object doc = _readWriteUsing(JSON_MAPPER_VANILLA);
+        Object doc = _readWriteUsing(JSON_MAPPER_VANILLA, _serialized);
         bh.consume(doc);
     }
 
+    // FastFP: Vector as array, Full FP optimizations
+
     @Benchmark
     public void fastFPRead(Blackhole bh) throws Exception {
-        Object doc = _readUsing(JSON_MAPPER_FAST_FP);
+        Object doc = _readUsing(JSON_MAPPER_FAST_FP, _serialized);
         bh.consume(doc);
     }
 
@@ -96,18 +140,38 @@ public class VectorHeavyReadWrite
 
     @Benchmark
     public void fastFPWriteAndRead(Blackhole bh) throws Exception {
-        Object doc = _readWriteUsing(JSON_MAPPER_FAST_FP);
+        Object doc = _readWriteUsing(JSON_MAPPER_FAST_FP, _serialized);
         bh.consume(doc);
     }
 
+    // Base64: Vector as Base64 packed binary (FP optimizations irrelevant)
+
+    @Benchmark
+    public void base64Read(Blackhole bh) throws Exception {
+        Object doc = _readUsing(JSON_MAPPER_BASE64, _serializedBase64);
+        bh.consume(doc);
+    }
+
+    @Benchmark
+    public void base64Write(Blackhole bh) throws Exception {
+        int len = _writeUsing(JSON_MAPPER_BASE64);
+        bh.consume(len);
+    }
+
+    @Benchmark
+    public void base64WriteAndRead(Blackhole bh) throws Exception {
+        Object doc = _readWriteUsing(JSON_MAPPER_BASE64, _serializedBase64);
+        bh.consume(doc);
+    }
+    
     /*
     /**********************************************************************
     /* Helper methods
     /**********************************************************************
      */
 
-    private Object _readUsing(ObjectMapper mapper) throws IOException {
-        return mapper.readValue(_serialized, HuggingFaceCohereScidocsQueries.class);
+    private Object _readUsing(ObjectMapper mapper, byte[] serialized) throws IOException {
+        return mapper.readValue(serialized, HuggingFaceCohereScidocsQueries.class);
     }
     
     private int _writeUsing(ObjectMapper mapper) throws IOException {
@@ -117,8 +181,8 @@ public class VectorHeavyReadWrite
         }
     }
 
-    private Object _readWriteUsing(ObjectMapper mapper) throws IOException {
-        Object doc = _readUsing(mapper);
+    private Object _readWriteUsing(ObjectMapper mapper, byte[] serialized) throws IOException {
+        Object doc = _readUsing(mapper, serialized);
         /*int len =*/ _writeUsing(mapper);
         return doc;
     }
